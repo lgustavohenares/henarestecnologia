@@ -1,234 +1,84 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-export default function Home() {
-  const [form, setForm] = useState({
-    nome: "",
-    endereco: "",
-    celular: "",
-    equipamento: "",
-    prioridade: "Media",
-    problema: "",
-  });
+export default function LoginPage() {
+  const router = useRouter();
 
-  const handleSubmit = async (
+  const [usuario, setUsuario] =
+    useState("");
+
+  const [senha, setSenha] =
+    useState("");
+
+  const entrar = (
     e: React.FormEvent
   ) => {
     e.preventDefault();
 
-    try {
-      const response = await fetch(
-        "/api/chamados",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type":
-              "application/json",
-          },
-          body: JSON.stringify(form),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(
-          "Erro ao registrar chamado"
-        );
-      }
-
-      alert(
-        "Chamado registrado com sucesso!"
-      );
-
-      setForm({
-        nome: "",
-        endereco: "",
-        celular: "",
-        equipamento: "",
-        prioridade: "Media",
-        problema: "",
-      });
-    } catch (error) {
-      console.error(error);
-
-      alert(
-        "Erro ao registrar chamado."
-      );
+    if (
+      usuario === "admin" &&
+      senha === "123456"
+    ) {
+      router.push("/dashboard");
+      return;
     }
+
+    alert("Usuário ou senha inválidos.");
   };
 
   return (
-    <main className="min-h-screen bg-slate-100">
+    <main
+      className="min-h-screen flex items-center justify-center bg-cover bg-center"
+      style={{
+        backgroundImage:
+          "url('/background.png')",
+      }}
+    >
+      <div className="bg-black/60 backdrop-blur-md rounded-2xl p-10 w-full max-w-md shadow-2xl border border-cyan-500">
 
-      <header className="bg-blue-700 text-white shadow-lg">
-        <div className="max-w-6xl mx-auto px-6 py-6">
-          <h1 className="text-3xl font-bold">
-            Henares Tecnologia
-          </h1>
+        <h1 className="text-4xl text-center font-bold text-cyan-400 mb-2">
+          Henares Tecnologia
+        </h1>
 
-          <p className="text-blue-100">
-            Sistema de Chamados Técnicos
-          </p>
-        </div>
-      </header>
+        <p className="text-center text-white mb-8">
+          Sistema de Gestão Técnica
+        </p>
 
-      <div className="max-w-5xl mx-auto p-6">
+        <form
+          onSubmit={entrar}
+          className="space-y-4"
+        >
+          <input
+            type="text"
+            placeholder="E-mail"
+            value={usuario}
+            onChange={(e) =>
+              setUsuario(e.target.value)
+            }
+            className="w-full p-3 rounded-lg bg-slate-800 text-white border border-slate-600"
+          />
 
-        <div className="bg-white rounded-xl shadow-xl p-8">
+          <input
+            type="password"
+            placeholder="Senha"
+            value={senha}
+            onChange={(e) =>
+              setSenha(e.target.value)
+            }
+            className="w-full p-3 rounded-lg bg-slate-800 text-white border border-slate-600"
+          />
 
-          <h2 className="text-2xl font-bold mb-6 text-gray-800">
-            Novo Chamado
-          </h2>
-
-          <form
-            onSubmit={handleSubmit}
-            className="space-y-6"
+          <button
+            type="submit"
+            className="w-full bg-cyan-500 hover:bg-cyan-600 text-black font-bold p-3 rounded-lg"
           >
-
-            <div>
-              <label className="block mb-2 font-semibold">
-                Nome
-              </label>
-
-              <input
-                type="text"
-                value={form.nome}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    nome: e.target.value,
-                  })
-                }
-                className="w-full border border-gray-300 rounded-lg p-3"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block mb-2 font-semibold">
-                Endereço
-              </label>
-
-              <input
-                type="text"
-                value={form.endereco}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    endereco: e.target.value,
-                  })
-                }
-                className="w-full border border-gray-300 rounded-lg p-3"
-                required
-              />
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-4">
-
-              <div>
-                <label className="block mb-2 font-semibold">
-                  Celular
-                </label>
-
-                <input
-                  type="text"
-                  value={form.celular}
-                  onChange={(e) =>
-                    setForm({
-                      ...form,
-                      celular: e.target.value,
-                    })
-                  }
-                  className="w-full border border-gray-300 rounded-lg p-3"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block mb-2 font-semibold">
-                  Equipamento
-                </label>
-
-                <input
-                  type="text"
-                  value={form.equipamento}
-                  onChange={(e) =>
-                    setForm({
-                      ...form,
-                      equipamento:
-                        e.target.value,
-                    })
-                  }
-                  className="w-full border border-gray-300 rounded-lg p-3"
-                  required
-                />
-              </div>
-
-            </div>
-
-            <div>
-              <label className="block mb-2 font-semibold">
-                Prioridade
-              </label>
-
-              <select
-                value={form.prioridade}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    prioridade:
-                      e.target.value,
-                  })
-                }
-                className="w-full border border-gray-300 rounded-lg p-3"
-              >
-                <option value="Baixa">
-                  Baixa
-                </option>
-
-                <option value="Media">
-                  Média
-                </option>
-
-                <option value="Alta">
-                  Alta
-                </option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block mb-2 font-semibold">
-                Problema
-              </label>
-
-              <textarea
-                rows={5}
-                value={form.problema}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    problema:
-                      e.target.value,
-                  })
-                }
-                className="w-full border border-gray-300 rounded-lg p-3"
-                required
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="bg-blue-700 hover:bg-blue-800 text-white px-8 py-3 rounded-lg font-semibold"
-            >
-              Registrar Chamado
-            </button>
-
-          </form>
-
-        </div>
+            Entrar
+          </button>
+        </form>
 
       </div>
-
     </main>
   );
 }
