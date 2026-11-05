@@ -86,7 +86,7 @@ export default function LoginPage() {
               type="text"
               value={nome}
               onChange={(e) => setNome(e.target.value)}
-              placeholder="admin"
+              placeholder="Nome de usuario"
               className="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-4 py-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors"
               required
             />
@@ -98,7 +98,7 @@ export default function LoginPage() {
               type="password"
               value={senha}
               onChange={(e) => setSenha(e.target.value)}
-              placeholder="123456"
+              placeholder="senha"
               className="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-4 py-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors"
               required
             />
