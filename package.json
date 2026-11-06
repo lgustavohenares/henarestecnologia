@@ -1,6 +1,6 @@
 {
-  "name": "nextjs",
-  "version": "0.1.0",
+  "name": "sistema de chamados",
+  "version": "1.4.4",
   "private": true,
   "scripts": {
     "dev": "next dev",
