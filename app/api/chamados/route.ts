@@ -130,7 +130,7 @@ export async function DELETE(req: Request) {
         const body = await req.json();
         id = body?.id;
       } catch {
-        // Ignora erro se não houver body
+        // Ignora se não houver body
       }
     }
 
