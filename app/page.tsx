@@ -12,7 +12,7 @@ export default function LoginPage() {
   const [senha, setSenha] = useState("");
   const [erro, setErro] = useState("");
 
-  // Temporizador de 4 segundos antes de exibir o formulário
+  // Temporizador de 2 segundos antes de exibir o formulário
   useEffect(() => {
     const timer = setTimeout(() => {
       setMostrarForm(true);
@@ -26,25 +26,23 @@ export default function LoginPage() {
     setErro("");
     setCarregando(true);
 
-    // Validação estática temporária: admin / 123456
+    // Validação direta e instantânea para o Projeto Integrador
     setTimeout(() => {
-      if (nome === "admin" && senha === "123456") {
-        localStorage.setItem(
-          "usuarioLogado",
-          JSON.stringify({ nome: "Administrador", perfil: "admin" })
-        );
+      if (nome.trim().toLowerCase() === "admin" && senha === "123456") {
+        // Define o cookie de sessão para o Middleware permitir o acesso
+        document.cookie = "sb-access-token=authenticated-session; path=/; max-age=86400";
         router.push("/dashboard");
       } else {
         setErro("Credenciais inválidas. Use admin / 123456");
         setCarregando(false);
       }
-    }, 600);
+    }, 500);
   }
 
   return (
     <main className="relative min-h-screen w-full flex flex-col items-center justify-start pt-16 md:pt-20 px-4 overflow-hidden">
 
-      {/* IMAGEM DE FUNDO: Totalmente visível e limpa */}
+      {/* IMAGEM DE FUNDO */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: "url('/fundo-henares.jpg')" }}
@@ -52,7 +50,7 @@ export default function LoginPage() {
         <div className="absolute inset-0 bg-slate-950/10"></div>
       </div>
 
-      {/* TELA INICIAL (Primeiros 4 segundos): Título animado no topo/centro */}
+      {/* TELA INICIAL (Primeiros 2 segundos) */}
       {!mostrarForm && (
         <div className="relative z-10 text-center animate-pulse space-y-2 mt-20 pointer-events-none">
           <h2 className="text-3xl md:text-5xl font-black text-cyan-400 tracking-widest drop-shadow-[0_0_25px_rgba(6,182,212,0.9)]">
@@ -62,7 +60,7 @@ export default function LoginPage() {
         </div>
       )}
 
-      {/* FORMULÁRIO DE LOGIN: Centro-alto com vidro fosco */}
+      {/* FORMULÁRIO DE LOGIN */}
       <div
         className={`relative z-20 w-full max-w-md p-8 bg-slate-950/60 border border-slate-700/60 backdrop-blur-md rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.7)] transition-all duration-1000 transform ${
           mostrarForm ? "opacity-100 translate-y-0 scale-100" : "opacity-0 -translate-y-10 scale-95 pointer-events-none"
@@ -86,7 +84,7 @@ export default function LoginPage() {
               type="text"
               value={nome}
               onChange={(e) => setNome(e.target.value)}
-              placeholder="Nome de usuario"
+              placeholder="admin"
               className="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-4 py-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors"
               required
             />
@@ -98,7 +96,7 @@ export default function LoginPage() {
               type="password"
               value={senha}
               onChange={(e) => setSenha(e.target.value)}
-              placeholder="senha"
+              placeholder="••••••"
               className="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-4 py-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors"
               required
             />

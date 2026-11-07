@@ -107,7 +107,7 @@ export default function AgendaPage() {
     }
   }
 
-  // Inicializa o Draggable para os itens da lista lateral
+  // Inicializa o Draggable para os itens da lista lateral irem para o calendário
   useEffect(() => {
     if (externalEventsRef.current) {
       new Draggable(externalEventsRef.current, {
@@ -127,16 +127,16 @@ export default function AgendaPage() {
     }
   }, [naoAgendados]);
 
-  // Função centralizada para atualizar o banco de dados via PUT
-  async function atualizarDataChamado(id: string, novaDataIso: string) {
+  // Função centralizada para atualizar ou remover a data no banco de dados via PUT
+  async function atualizarDataChamado(id: string, novaDataIso: string | null) {
     try {
       const response = await fetch("/api/chamados", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           id: id,
-          status: "Agendado",
-          data_agendamento: novaDataIso,
+          status: novaDataIso ? "Agendado" : "Aberto",
+          data_agendamento: novaDataIso, // null remove a data no banco
         }),
       });
 
@@ -181,6 +181,19 @@ export default function AgendaPage() {
     }
   }
 
+  // Ao clicar num evento agendado no calendário, pergunta se deseja cancelar o agendamento
+  const handleEventClick = async (info: any) => {
+    const chamadoId = info.event.id;
+    const titulo = info.event.title;
+
+    if (confirm(`Deseja cancelar o agendamento de "${titulo}" e devolvê-lo para a lista de pendentes?`)) {
+      const sucesso = await atualizarDataChamado(chamadoId, null);
+      if (sucesso) {
+        carregarChamados();
+      }
+    }
+  };
+
   useEffect(() => {
     carregarChamados();
   }, []);
@@ -192,7 +205,7 @@ export default function AgendaPage() {
           <div>
             <h1 className="text-3xl font-bold text-cyan-400">Agenda de Chamados</h1>
             <p className="text-slate-400 text-sm">
-              Arraste chamados da lista lateral para agendar ou altere a data diretamente no calendário.
+              Arraste da lista para agendar. Para cancelar um agendamento, basta clicar nele no calendário.
             </p>
           </div>
           <button
@@ -226,11 +239,14 @@ export default function AgendaPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* LISTA LATERAL */}
-          <div className="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex flex-col h-full">
+          <div
+            ref={externalEventsRef}
+            className="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex flex-col h-full"
+          >
             <h3 className="text-sm font-bold text-amber-400 mb-1">Não Agendados / Pendentes</h3>
             <p className="text-xs text-slate-400 mb-4">Arraste um item para o calendário:</p>
 
-            <div ref={externalEventsRef} className="space-y-2 overflow-y-auto max-h-[600px] pr-1">
+            <div className="space-y-2 overflow-y-auto max-h-[600px] pr-1">
               {naoAgendados.length === 0 ? (
                 <p className="text-xs text-slate-500 italic p-2">Nenhum chamado pendente de data.</p>
               ) : (
@@ -267,6 +283,7 @@ export default function AgendaPage() {
                 events={events}
                 eventDrop={handleEventDrop}
                 eventReceive={handleEventReceive}
+                eventClick={handleEventClick}
                 locale="pt-br"
                 headerToolbar={{
                   left: "prev,next today",
