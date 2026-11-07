@@ -1,56 +1,88 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 
-// Função para CRIAR um novo chamado (POST)
+// Listar todos os chamados (GET)
+export async function GET() {
+  try {
+    const { data, error } = await supabase
+      .from("chamados")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json(data);
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 500 });
+  }
+}
+
+// Criar um novo chamado (POST)
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { titulo, descricao, cliente, prioridade } = body;
 
-    if (!titulo || !descricao) {
-      return NextResponse.json(
-        { message: "Título e descrição são obrigatórios." },
-        { status: 400 }
-      );
+    const { data, error } = await supabase
+      .from("chamados")
+      .insert([body])
+      .select();
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true, data });
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 500 });
+  }
+}
+
+// Atualizar status ou data de agendamento do chamado (PUT)
+export async function PUT(request: Request) {
+  try {
+    const body = await request.json();
+    const { id, status, data_agendamento } = body;
+
+    if (!id) {
+      return NextResponse.json({ error: "ID é obrigatório para atualização." }, { status: 400 });
+    }
+
+    // Objeto dinâmico para atualizar apenas o que foi enviado
+    const dadosAtualizacao: any = {};
+    if (status) dadosAtualizacao.status = status;
+    if (data_agendamento !== undefined) dadosAtualizacao.data_agendamento = data_agendamento;
+
+    // Se estiver a agendar via calendário e o status anterior for comum, atualizamos automaticamente para "Agendado"
+    if (data_agendamento && !status) {
+      dadosAtualizacao.status = "Agendado";
     }
 
     const { data, error } = await supabase
       .from("chamados")
-      .insert([
-        {
-          titulo,
-          descricao,
-          cliente,
-          prioridade: prioridade || "Normal",
-          status: "Aberto",
-        },
-      ])
+      .update(dadosAtualizacao)
+      .eq("id", id)
       .select();
 
     if (error) {
-      return NextResponse.json({ message: error.message }, { status: 400 });
+      return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json(
-      { message: "Chamado criado com sucesso!", data },
-      { status: 201 }
-    );
+    return NextResponse.json({ success: true, data });
   } catch (err: any) {
-    return NextResponse.json({ message: err.message }, { status: 500 });
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
 
-// Função para APAGAR um chamado (DELETE)
+// Excluir chamado (DELETE)
 export async function DELETE(request: Request) {
   try {
     const body = await request.json();
     const { id } = body;
 
     if (!id) {
-      return NextResponse.json(
-        { message: "ID não fornecido para exclusão." },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "ID é obrigatório para exclusão." }, { status: 400 });
     }
 
     const { error } = await supabase
@@ -59,14 +91,11 @@ export async function DELETE(request: Request) {
       .eq("id", id);
 
     if (error) {
-      return NextResponse.json({ message: error.message }, { status: 500 });
+      return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json(
-      { message: "Removido com sucesso do banco de dados." },
-      { status: 200 }
-    );
+    return NextResponse.json({ success: true });
   } catch (err: any) {
-    return NextResponse.json({ message: err.message }, { status: 500 });
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
